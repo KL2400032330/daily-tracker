@@ -7,37 +7,82 @@
   <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body class="auth-page">
-  <div class="auth-card">
-    <div class="auth-logo">
-      <div class="auth-logo-icon">
-        <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 11l3 3L22 4" />
-          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
-        </svg>
+
+  <div class="auth-split">
+
+    <!-- Left panel — illustration -->
+    <div class="auth-banner">
+      <div class="auth-banner-content">
+        <div class="banner-logo">
+          <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4" />
+            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+          </svg>
+        </div>
+        <h2 class="banner-title">DailyTracker</h2>
+        <p class="banner-sub">Your personal productivity &amp; expense companion</p>
+
+        <!-- Illustration -->
+        <div class="banner-illustration">
+          <img
+            src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=480&q=80&auto=format&fit=crop"
+            alt="Productivity illustration"
+          />
+        </div>
+
+        <div class="banner-features">
+          <div class="banner-feature">
+            <span class="feature-dot"></span>
+            Track daily tasks with a checklist
+          </div>
+          <div class="banner-feature">
+            <span class="feature-dot"></span>
+            Monitor expenses in ₹
+          </div>
+          <div class="banner-feature">
+            <span class="feature-dot"></span>
+            View monthly spending averages
+          </div>
+        </div>
       </div>
-      <span class="auth-logo-text">DailyTracker</span>
     </div>
 
-    <h1 class="auth-title">Welcome back</h1>
-    <p class="auth-subtitle">Sign in to your account to continue</p>
+    <!-- Right panel — form -->
+    <div class="auth-form-panel">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <div class="auth-logo-icon">
+            <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 11l3 3L22 4" />
+              <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+            </svg>
+          </div>
+          <span class="auth-logo-text">DailyTracker</span>
+        </div>
 
-    <div class="error-msg" id="errorMsg"></div>
+        <h1 class="auth-title">Welcome back</h1>
+        <p class="auth-subtitle">Sign in to your account to continue</p>
 
-    <form id="loginForm" novalidate>
-      <div class="form-group">
-        <label for="email">Email address</label>
-        <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required />
+        <div class="error-msg" id="errorMsg"></div>
+
+        <form id="loginForm" novalidate>
+          <div class="form-group">
+            <label for="email">Email address</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Your password" autocomplete="current-password" required />
+          </div>
+          <button type="submit" class="btn-primary" id="submitBtn">Sign in</button>
+        </form>
+
+        <div class="auth-footer">
+          Don't have an account? <a href="/signup.html">Create one</a>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Your password" autocomplete="current-password" required />
-      </div>
-      <button type="submit" class="btn-primary" id="submitBtn">Sign in</button>
-    </form>
-
-    <div class="auth-footer">
-      Don't have an account? <a href="/signup.html">Create one</a>
     </div>
+
   </div>
 
   <script src="/js/auth.js"></script>

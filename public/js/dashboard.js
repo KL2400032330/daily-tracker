@@ -59,7 +59,7 @@ async function handleLogout() {
 // ── Utility ─────────────────────────────────────────────────
 
 function formatCurrency(amount) {
-  return '$' + Number(amount).toFixed(2);
+  return '₹' + Number(amount).toFixed(2);
 }
 
 function formatDate(dateStr) {

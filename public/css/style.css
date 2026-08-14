@@ -744,3 +744,201 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #cbd5e1;
 }
+
+/* ── Auth Split Layout ────────────────────────────────────── */
+.auth-split {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.auth-banner {
+  flex: 1;
+  background: linear-gradient(145deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-banner::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 300px;
+  height: 300px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+}
+
+.auth-banner::after {
+  content: '';
+  position: absolute;
+  bottom: -60px;
+  left: -60px;
+  width: 220px;
+  height: 220px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+}
+
+.auth-banner-content {
+  position: relative;
+  z-index: 1;
+  max-width: 380px;
+  width: 100%;
+}
+
+.banner-logo {
+  width: 48px;
+  height: 48px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.banner-logo svg {
+  width: 26px;
+  height: 26px;
+  stroke: white;
+  fill: none;
+}
+
+.banner-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+
+.banner-sub {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+.banner-illustration {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.banner-illustration img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.banner-features {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.banner-feature {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255,255,255,0.85);
+  font-size: 0.9rem;
+}
+
+.feature-dot {
+  width: 8px;
+  height: 8px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.auth-form-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  background: var(--bg);
+}
+
+/* Override auth-card inside split layout */
+.auth-form-panel .auth-card {
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+/* Hide left panel on small screens */
+@media (max-width: 768px) {
+  .auth-banner {
+    display: none;
+  }
+  .auth-form-panel {
+    padding: 24px 16px;
+  }
+  .auth-split {
+    display: block;
+  }
+  .auth-form-panel {
+    min-height: 100vh;
+  }
+}
+
+/* ── Dashboard Hero ───────────────────────────────────────── */
+.dashboard-hero {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 28px;
+  height: 160px;
+  box-shadow: var(--shadow-md);
+}
+
+.hero-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(30,41,59,0.75) 0%, rgba(30,41,59,0.3) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px 28px;
+}
+
+.hero-overlay h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.02em;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+
+.hero-overlay p {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.85);
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-hero {
+    height: 120px;
+  }
+  .hero-overlay h1 {
+    font-size: 1.3rem;
+  }
+}
