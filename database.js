@@ -84,6 +84,7 @@ async function init() {
       user_id INTEGER NOT NULL,
       item TEXT NOT NULL,
       amount REAL NOT NULL,
+      spent REAL DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id)
     )

@@ -168,7 +168,7 @@ async function loadExpenses() {
     const data = await res.json();
     expenses = data.expenses; totalSpent = data.total; monthlyAverage = data.monthlyAverage;
     renderExpenses();
-    renderBudgets(); // re-render budgets when expenses change
+    renderBudgets();
   } catch { showInlineError('expenseError', 'Failed to load expenses. Please refresh.'); }
 }
 
@@ -272,8 +272,7 @@ function renderBudgets() {
   grid.querySelectorAll('.budget-item').forEach(el => el.remove());
 
   let totalBudgeted = 0, totalBudgetSpent = 0;
-
-  budgets.forEach(b => { totalBudgeted += b.amount; });
+  budgets.forEach(b => { totalBudgeted += b.amount; totalBudgetSpent += (b.spent || 0); });
 
   document.getElementById('budgetCount').textContent =
     `${budgets.length} item${budgets.length !== 1 ? 's' : ''} planned`;
@@ -282,9 +281,8 @@ function renderBudgets() {
   emptyEl.style.display = 'none';
 
   budgets.forEach(b => {
-    const spent = getSpentForItem(b.item);
-    totalBudgetSpent += spent;
-    const pct = Math.min((spent / b.amount) * 100, 100);
+    const spent = b.spent || 0;
+    const pct = b.amount > 0 ? Math.min((spent / b.amount) * 100, 100) : 0;
     const isOver = spent > b.amount;
     const isWarning = !isOver && pct >= 75;
     const statusClass = isOver ? 'over' : isWarning ? 'warning' : 'safe';
@@ -295,26 +293,51 @@ function renderBudgets() {
     div.innerHTML = `
       <div class="budget-item-top">
         <div class="budget-item-name">${escapeHtml(b.item)}</div>
-        <div class="budget-item-amounts">
-          <div class="budget-item-budget">Budget: ${formatCurrency(b.amount)}</div>
-          <div class="budget-item-spent ${statusClass}">Spent: ${formatCurrency(spent)}</div>
-        </div>
-        <button class="btn-delete" aria-label="Delete budget item ${escapeHtml(b.item)}">
+        <button class="btn-delete" aria-label="Delete ${escapeHtml(b.item)}">
           <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
         </button>
       </div>
-      <div class="budget-progress-bar">
+
+      <div class="budget-amounts-detail">
+        <div class="budget-amount-pill pill-budgeted">
+          <div class="pill-label">Budget</div>
+          <div class="pill-value">${formatCurrency(b.amount)}</div>
+        </div>
+        <div class="budget-amount-pill pill-spent">
+          <div class="pill-label">Spent</div>
+          <div class="pill-value">${formatCurrency(spent)}</div>
+        </div>
+        <div class="budget-amount-pill pill-remaining ${remaining >= 0 ? 'positive' : 'negative'}">
+          <div class="pill-label">${remaining >= 0 ? 'Remaining' : 'Over by'}</div>
+          <div class="pill-value">${formatCurrency(Math.abs(remaining))}</div>
+        </div>
+      </div>
+
+      <div class="budget-progress-bar" style="margin-top:10px">
         <div class="budget-progress-fill ${statusClass}" style="width:${pct}%"></div>
       </div>
-      <div class="budget-item-status ${statusClass}">
+      <div class="budget-item-status ${statusClass}" style="margin-top:5px">
         ${isOver
           ? `⚠ Over budget by ${formatCurrency(Math.abs(remaining))}`
           : isWarning
-          ? `${formatCurrency(remaining)} remaining — almost at limit`
-          : `${formatCurrency(remaining)} remaining (${Math.round(pct)}% used)`}
+          ? `${formatCurrency(remaining)} remaining — almost at limit (${Math.round(pct)}% used)`
+          : `${Math.round(pct)}% used · ${formatCurrency(remaining)} left`}
+      </div>
+
+      <div class="budget-spent-row">
+        <input type="number" class="spent-input" placeholder="Add spent amount (₹)" min="0" step="0.01" />
+        <button class="btn-log-spent">+ Log Spent</button>
       </div>`;
 
     div.querySelector('.btn-delete').addEventListener('click', () => handleDeleteBudget(b.id));
+    div.querySelector('.btn-log-spent').addEventListener('click', () => {
+      const input = div.querySelector('.spent-input');
+      const val = parseFloat(input.value);
+      if (!val || val < 0) { input.focus(); return; }
+      handleUpdateSpent(b.id, spent + val);
+      input.value = '';
+    });
+
     grid.appendChild(div);
   });
 
@@ -357,6 +380,22 @@ async function handleAddBudget() {
     renderBudgets();
   } catch { showInlineError('budgetError', 'Network error. Please try again.'); }
   finally { btn.disabled = false; }
+}
+
+async function handleUpdateSpent(id, newSpent) {
+  const idx = budgets.findIndex(b => b.id === id);
+  if (idx === -1) return;
+  const prev = budgets[idx].spent;
+  budgets[idx].spent = newSpent;
+  renderBudgets();
+  try {
+    const res = await fetch(`/api/budgets/${id}/spent`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ spent: newSpent })
+    });
+    if (!res.ok) { budgets[idx].spent = prev; renderBudgets(); showInlineError('budgetError', 'Failed to update spent.'); }
+    else { const updated = await res.json(); budgets[idx].spent = updated.spent; renderBudgets(); }
+  } catch { budgets[idx].spent = prev; renderBudgets(); showInlineError('budgetError', 'Network error.'); }
 }
 
 async function handleDeleteBudget(id) {

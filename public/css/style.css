@@ -538,3 +538,76 @@ body {
   .budget-summary-bar { flex-direction: column; }
   .stats-bar { flex-direction: column; }
 }
+
+/* ── Password toggle ──────────────────────────────────────── */
+.password-wrap {
+  position: relative; display: flex; align-items: center;
+}
+.password-wrap input {
+  width: 100%; padding-right: 42px;
+}
+.btn-toggle-pw {
+  position: absolute; right: 10px;
+  background: none; border: none; cursor: pointer;
+  padding: 4px; color: var(--text-light);
+  display: flex; align-items: center;
+  transition: color 0.15s;
+}
+.btn-toggle-pw:hover { color: var(--accent); }
+.btn-toggle-pw svg {
+  width: 18px; height: 18px;
+  stroke: currentColor; fill: none;
+}
+
+/* ── Budget item spent input ──────────────────────────────── */
+.budget-spent-row {
+  display: flex; align-items: center; gap: 8px; margin-top: 10px;
+}
+.budget-spent-row input {
+  flex: 1; padding: 7px 10px;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 0.85rem; color: var(--text-dark); outline: none;
+  background: var(--bg);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.budget-spent-row input:focus {
+  border-color: var(--accent); box-shadow: 0 0 0 3px rgba(13,148,136,0.1); background: white;
+}
+.budget-spent-row input::placeholder { color: var(--text-light); }
+.btn-log-spent {
+  padding: 7px 14px;
+  background: var(--accent); color: white;
+  border: none; border-radius: var(--radius-sm);
+  font-size: 0.8rem; font-weight: 700; cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.btn-log-spent:hover { background: var(--accent-dark); }
+
+.budget-amounts-detail {
+  display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;
+}
+.budget-amount-pill {
+  flex: 1; min-width: 80px;
+  padding: 8px 12px; border-radius: var(--radius-sm);
+  text-align: center;
+}
+.budget-amount-pill .pill-label {
+  font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; margin-bottom: 2px;
+}
+.budget-amount-pill .pill-value {
+  font-size: 0.95rem; font-weight: 800; letter-spacing: -0.01em;
+}
+.pill-budgeted { background: var(--accent-light); border: 1px solid var(--accent-mid); }
+.pill-budgeted .pill-label { color: var(--accent); }
+.pill-budgeted .pill-value { color: var(--text-dark); }
+.pill-spent { background: var(--warning-light); border: 1px solid #fde68a; }
+.pill-spent .pill-label { color: var(--warning); }
+.pill-spent .pill-value { color: var(--text-dark); }
+.pill-remaining.positive { background: var(--success-light); border: 1px solid #a7f3d0; }
+.pill-remaining.positive .pill-label { color: var(--success); }
+.pill-remaining.positive .pill-value { color: var(--success); }
+.pill-remaining.negative { background: var(--danger-light); border: 1px solid #fecaca; }
+.pill-remaining.negative .pill-label { color: var(--danger); }
+.pill-remaining.negative .pill-value { color: var(--danger); }

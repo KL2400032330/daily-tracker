@@ -333,6 +333,30 @@ app.post('/api/budgets', requireAuth, async (req, res) => {
   }
 });
 
+// PATCH /api/budgets/:id/spent — add or subtract from spent
+app.patch('/api/budgets/:id/spent', requireAuth, async (req, res) => {
+  const budgetId = parseInt(req.params.id, 10);
+  const { spent } = req.body;
+  if (isNaN(parseFloat(spent)) || parseFloat(spent) < 0) {
+    return res.status(400).json({ error: 'A valid amount is required.' });
+  }
+  try {
+    const budget = await get(
+      'SELECT * FROM budgets WHERE id = ? AND user_id = ?',
+      [budgetId, req.session.userId]
+    );
+    if (!budget) return res.status(404).json({ error: 'Budget item not found.' });
+    await run(
+      'UPDATE budgets SET spent = ? WHERE id = ? AND user_id = ?',
+      [parseFloat(spent), budgetId, req.session.userId]
+    );
+    const updated = await get('SELECT * FROM budgets WHERE id = ?', [budgetId]);
+    return res.json(updated);
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to update spent amount.' });
+  }
+});
+
 // DELETE /api/budgets/:id
 app.delete('/api/budgets/:id', requireAuth, async (req, res) => {
   const budgetId = parseInt(req.params.id, 10);
