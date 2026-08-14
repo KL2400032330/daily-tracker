@@ -115,6 +115,32 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+// POST /api/auth/change-password
+app.post('/api/auth/change-password', async (req, res) => {
+  if (!req.session || !req.session.userId) {
+    return res.status(401).json({ error: 'Not logged in.' });
+  }
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Both passwords are required.' });
+  }
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters.' });
+  }
+  try {
+    const user = await get('SELECT * FROM users WHERE id = ?', [req.session.userId]);
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    const match = await bcrypt.compare(currentPassword, user.password);
+    if (!match) return res.status(401).json({ error: 'Current password is incorrect.' });
+    const hashed = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    await run('UPDATE users SET password = ? WHERE id = ?', [hashed, req.session.userId]);
+    return res.json({ message: 'Password updated successfully.' });
+  } catch (err) {
+    console.error('Change password error:', err);
+    return res.status(500).json({ error: 'Server error. Please try again.' });
+  }
+});
+
 // POST /api/auth/logout
 app.post('/api/auth/logout', (req, res) => {
   req.session.destroy((err) => {

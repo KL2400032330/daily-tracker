@@ -89,6 +89,13 @@ async function init() {
       FOREIGN KEY (user_id) REFERENCES users(id)
     )
   `);
+
+  // Safely add 'spent' column if it doesn't exist yet (for existing databases)
+  try {
+    await run('ALTER TABLE budgets ADD COLUMN spent REAL DEFAULT 0');
+  } catch (_) {
+    // Column already exists — ignore
+  }
 }
 
 module.exports = { db, run, get, all, init };
