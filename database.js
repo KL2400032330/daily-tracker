@@ -78,6 +78,17 @@ async function init() {
       FOREIGN KEY (user_id) REFERENCES users(id)
     )
   `);
+
+  await run(`
+    CREATE TABLE IF NOT EXISTS budgets (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      item TEXT NOT NULL,
+      amount REAL NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
 }
 
 module.exports = { db, run, get, all, init };

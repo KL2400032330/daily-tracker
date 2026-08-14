@@ -297,6 +297,58 @@ app.delete('/api/expenses/:id', requireAuth, async (req, res) => {
   }
 });
 
+// ─── BUDGET ROUTES ───────────────────────────────────────────────────────────
+
+// GET /api/budgets
+app.get('/api/budgets', requireAuth, async (req, res) => {
+  try {
+    const budgets = await all(
+      'SELECT * FROM budgets WHERE user_id = ? ORDER BY created_at ASC',
+      [req.session.userId]
+    );
+    return res.json(budgets);
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to load budgets.' });
+  }
+});
+
+// POST /api/budgets
+app.post('/api/budgets', requireAuth, async (req, res) => {
+  const { item, amount } = req.body;
+  if (!item || item.trim().length === 0) {
+    return res.status(400).json({ error: 'Item name is required.' });
+  }
+  if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+    return res.status(400).json({ error: 'A valid positive amount is required.' });
+  }
+  try {
+    const result = await run(
+      'INSERT INTO budgets (user_id, item, amount) VALUES (?, ?, ?)',
+      [req.session.userId, item.trim(), parseFloat(amount)]
+    );
+    const budget = await get('SELECT * FROM budgets WHERE id = ?', [result.lastID]);
+    return res.status(201).json(budget);
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to create budget item.' });
+  }
+});
+
+// DELETE /api/budgets/:id
+app.delete('/api/budgets/:id', requireAuth, async (req, res) => {
+  const budgetId = parseInt(req.params.id, 10);
+  try {
+    const budget = await get(
+      'SELECT * FROM budgets WHERE id = ? AND user_id = ?',
+      [budgetId, req.session.userId]
+    );
+    if (!budget) return res.status(404).json({ error: 'Budget item not found.' });
+    await run('DELETE FROM budgets WHERE id = ? AND user_id = ?', [budgetId, req.session.userId]);
+    return res.json({ message: 'Budget item deleted.' });
+  } catch (err) {
+    return res.status(500).json({ error: 'Failed to delete budget item.' });
+  }
+});
+
 // ─── CATCH-ALL ────────────────────────────────────────────────────────────────
 
 app.get('*', (req, res) => {
