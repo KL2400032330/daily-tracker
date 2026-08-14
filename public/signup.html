@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up — DailyTracker</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">
+        <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 11l3 3L22 4" />
+          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+        </svg>
+      </div>
+      <span class="auth-logo-text">DailyTracker</span>
+    </div>
+
+    <h1 class="auth-title">Create account</h1>
+    <p class="auth-subtitle">Start tracking your tasks and expenses</p>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <form id="signupForm" novalidate>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="yourname" autocomplete="username" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="At least 6 characters" autocomplete="new-password" required />
+      </div>
+      <button type="submit" class="btn-primary" id="submitBtn">Create account</button>
+    </form>
+
+    <div class="auth-footer">
+      Already have an account? <a href="/index.html">Sign in</a>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+</body>
+</html>
