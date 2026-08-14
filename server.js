@@ -10,12 +10,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const SALT_ROUNDS = 12;
 
-// Trust Railway's reverse proxy so secure cookies work over HTTPS
+// Trust Render/Railway reverse proxy so secure cookies work over HTTPS
 app.set('trust proxy', 1);
 
 // Middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(session({
   store: new SQLiteStore({
@@ -28,9 +27,12 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
   }
 }));
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Auth middleware
 function requireAuth(req, res, next) {
