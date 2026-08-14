@@ -1,36 +1,27 @@
 /**
- * auth.js — handles login and signup pages
- * Redirects to dashboard if already logged in.
+ * auth.js — login by username + password, signup with username + password only
  */
 
 const isSignupPage = window.location.pathname.includes('signup');
 
-// Check if already logged in; redirect to dashboard
+// Redirect to dashboard if already logged in
 (async function checkAlreadyLoggedIn() {
   try {
     const res = await fetch('/api/auth/me');
-    if (res.ok) {
-      window.location.replace('/dashboard.html');
-    }
-  } catch (_) {
-    // Not logged in — stay on page
-  }
+    if (res.ok) window.location.replace('/dashboard.html');
+  } catch (_) {}
 })();
-
-// ── Utility ─────────────────────────────────────────────────
 
 function showError(message) {
   const el = document.getElementById('errorMsg');
   el.textContent = message;
   el.classList.add('visible');
 }
-
 function hideError() {
   const el = document.getElementById('errorMsg');
   el.textContent = '';
   el.classList.remove('visible');
 }
-
 function setLoading(btn, loading) {
   btn.disabled = loading;
   btn.textContent = loading
@@ -38,7 +29,7 @@ function setLoading(btn, loading) {
     : (isSignupPage ? 'Create account' : 'Sign in');
 }
 
-// ── Login ────────────────────────────────────────────────────
+// ── Login ─────────────────────────────────────────────────────
 
 function initLoginForm() {
   const form = document.getElementById('loginForm');
@@ -48,37 +39,24 @@ function initLoginForm() {
     e.preventDefault();
     hideError();
 
-    const email = document.getElementById('email').value.trim();
+    const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
     const btn = document.getElementById('submitBtn');
 
-    if (!email) {
-      showError('Please enter your email address.');
-      return;
-    }
-    if (!password) {
-      showError('Please enter your password.');
-      return;
-    }
+    if (!username) { showError('Please enter your username.'); return; }
+    if (!password) { showError('Please enter your password.'); return; }
 
     setLoading(btn, true);
-
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ username, password })
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        showError(data.error || 'Login failed. Please try again.');
-        return;
-      }
-
+      if (!res.ok) { showError(data.error || 'Login failed. Please try again.'); return; }
       window.location.replace('/dashboard.html');
-    } catch (err) {
+    } catch {
       showError('Network error. Please check your connection and try again.');
     } finally {
       setLoading(btn, false);
@@ -86,7 +64,7 @@ function initLoginForm() {
   });
 }
 
-// ── Signup ───────────────────────────────────────────────────
+// ── Signup ────────────────────────────────────────────────────
 
 function initSignupForm() {
   const form = document.getElementById('signupForm');
@@ -97,61 +75,32 @@ function initSignupForm() {
     hideError();
 
     const username = document.getElementById('username').value.trim();
-    const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const btn = document.getElementById('submitBtn');
 
-    if (!username) {
-      showError('Please enter a username.');
-      return;
-    }
-    if (username.length < 2) {
-      showError('Username must be at least 2 characters.');
-      return;
-    }
-    if (!email) {
-      showError('Please enter your email address.');
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      showError('Please enter a valid email address.');
-      return;
-    }
-    if (!password) {
-      showError('Please enter a password.');
-      return;
-    }
-    if (password.length < 6) {
-      showError('Password must be at least 6 characters.');
-      return;
-    }
+    if (!username) { showError('Please enter a username.'); return; }
+    if (username.length < 2) { showError('Username must be at least 2 characters.'); return; }
+    if (/\s/.test(username)) { showError('Username cannot contain spaces.'); return; }
+    if (!password) { showError('Please enter a password.'); return; }
+    if (password.length < 6) { showError('Password must be at least 6 characters.'); return; }
 
     setLoading(btn, true);
-
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password })
+        body: JSON.stringify({ username, password })
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        showError(data.error || 'Signup failed. Please try again.');
-        return;
-      }
-
+      if (!res.ok) { showError(data.error || 'Signup failed. Please try again.'); return; }
       window.location.replace('/dashboard.html');
-    } catch (err) {
+    } catch {
       showError('Network error. Please check your connection and try again.');
     } finally {
       setLoading(btn, false);
     }
   });
 }
-
-// ── Init ─────────────────────────────────────────────────────
 
 if (isSignupPage) {
   initSignupForm();

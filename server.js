@@ -46,16 +46,16 @@ function requireAuth(req, res, next) {
 
 // POST /api/auth/signup
 app.post('/api/auth/signup', async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, password } = req.body;
 
-  if (!username || !email || !password) {
-    return res.status(400).json({ error: 'All fields are required.' });
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required.' });
   }
   if (username.trim().length < 2) {
     return res.status(400).json({ error: 'Username must be at least 2 characters.' });
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return res.status(400).json({ error: 'Please enter a valid email address.' });
+  if (/\s/.test(username.trim())) {
+    return res.status(400).json({ error: 'Username cannot contain spaces.' });
   }
   if (password.length < 6) {
     return res.status(400).json({ error: 'Password must be at least 6 characters.' });
@@ -63,23 +63,23 @@ app.post('/api/auth/signup', async (req, res) => {
 
   try {
     const existingUser = await get(
-      'SELECT id FROM users WHERE email = ? OR username = ?',
-      [email.toLowerCase(), username.trim()]
+      'SELECT id FROM users WHERE username = ?',
+      [username.trim()]
     );
     if (existingUser) {
-      return res.status(409).json({ error: 'An account with that email or username already exists.' });
+      return res.status(409).json({ error: 'That username is already taken.' });
     }
 
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     const result = await run(
-      'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
-      [username.trim(), email.toLowerCase(), hashedPassword]
+      'INSERT INTO users (username, password) VALUES (?, ?)',
+      [username.trim(), hashedPassword]
     );
 
     req.session.userId = result.lastID;
     req.session.username = username.trim();
 
-    return res.status(201).json({ id: result.lastID, username: username.trim(), email: email.toLowerCase() });
+    return res.status(201).json({ id: result.lastID, username: username.trim() });
   } catch (err) {
     console.error('Signup error:', err);
     return res.status(500).json({ error: 'Server error. Please try again.' });
@@ -88,27 +88,27 @@ app.post('/api/auth/signup', async (req, res) => {
 
 // POST /api/auth/login
 app.post('/api/auth/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required.' });
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required.' });
   }
 
   try {
-    const user = await get('SELECT * FROM users WHERE email = ?', [email.toLowerCase()]);
+    const user = await get('SELECT * FROM users WHERE username = ?', [username.trim()]);
     if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+      return res.status(401).json({ error: 'Invalid username or password.' });
     }
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
-      return res.status(401).json({ error: 'Invalid email or password.' });
+      return res.status(401).json({ error: 'Invalid username or password.' });
     }
 
     req.session.userId = user.id;
     req.session.username = user.username;
 
-    return res.json({ id: user.id, username: user.username, email: user.email });
+    return res.json({ id: user.id, username: user.username });
   } catch (err) {
     console.error('Login error:', err);
     return res.status(500).json({ error: 'Server error. Please try again.' });
@@ -132,7 +132,7 @@ app.get('/api/auth/me', async (req, res) => {
     return res.status(401).json({ error: 'Not logged in.' });
   }
   try {
-    const user = await get('SELECT id, username, email FROM users WHERE id = ?', [req.session.userId]);
+    const user = await get('SELECT id, username FROM users WHERE id = ?', [req.session.userId]);
     if (!user) {
       return res.status(401).json({ error: 'User not found.' });
     }
